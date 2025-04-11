@@ -1,0 +1,70 @@
+.App {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+  }
+  
+  h1 {
+    color: #1e90ff;
+    text-align: center;
+  }
+  
+  .error {
+    color: red;
+    text-align: center;
+  }
+  
+  .task-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .task-input input, .task-input select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  .task-input button {
+    padding: 8px 16px;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .task-input button:hover {
+    background-color: #1565c0;
+  }
+  
+  .task-list, .team-view {
+    margin-bottom: 20px;
+  }
+  
+  .task-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: white;
+    border-radius: 4px;
+  }
+  
+  .team-view ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .team-view li {
+    padding: 5px;
+    background-color: white;
+    margin: 5px 0;
+    border-radius: 4px;
+  }
