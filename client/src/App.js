@@ -8,9 +8,14 @@ function App() {
   const [newTask, setNewTask] = useState({ name: '', duration: '', priority: 'moyenne' });
   const [error, setError] = useState('');
 
+  console.log('API URL:', process.env.REACT_APP_API_URL);
+
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/api/tasks`)
-      .then(response => setTasks(response.data || []))
+      .then(response => {
+        console.log('Tasks fetched:', response.data);
+        setTasks(response.data || []);
+      })
       .catch(error => {
         console.error('Fetch tasks error:', error.response?.status, error.message);
         setError('Failed to load tasks');
@@ -19,7 +24,10 @@ function App() {
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/api/users`)
-      .then(response => setUsers(response.data || []))
+      .then(response => {
+        console.log('Users fetched:', response.data);
+        setUsers(response.data || []);
+      })
       .catch(error => {
         console.error('Fetch users error:', error.response?.status, error.message);
         setError('Failed to load users');
@@ -29,11 +37,13 @@ function App() {
   const handleAddTask = async (e) => {
     e.preventDefault();
     try {
+      console.log('Adding task:', newTask);
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/tasks`, {
         name: newTask.name,
         duration: parseInt(newTask.duration),
         priority: newTask.priority
       });
+      console.log('Task added:', response.data);
       setTasks([...tasks, response.data]);
       setNewTask({ name: '', duration: '', priority: 'moyenne' });
       setError('');
