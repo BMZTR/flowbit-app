@@ -6,7 +6,8 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+app.use(cors({ origin: process.env.FRONTEND_URL }));
+console.log('CORS origin set to:', process.env.FRONTEND_URL);
 app.use(express.json());
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
