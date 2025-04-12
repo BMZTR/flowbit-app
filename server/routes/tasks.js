@@ -1,9 +1,10 @@
 const express = require('express');
 const fs = require('fs').promises;
+const path = require('path');
 const moment = require('moment');
 const router = express.Router();
 
-const TASKS_FILE = './data/tasks.json';
+const TASKS_FILE = path.join(__dirname, '../data/tasks.json');
 
 const userCalendar = [
   { start: '2025-04-12T09:00:00Z', end: '2025-04-12T10:00:00Z', title: 'Réunion' },
@@ -36,15 +37,13 @@ function suggestTaskSlot(task, calendar) {
 
 router.get('/', async (req, res) => {
   try {
-    try {
-      await fs.access(TASKS_FILE);
-    } catch {
-      await fs.writeFile(TASKS_FILE, JSON.stringify([]));
-    }
+    console.log('Attempting to access tasks file:', TASKS_FILE);
+    await fs.access(TASKS_FILE);
     const data = await fs.readFile(TASKS_FILE, 'utf8');
+    console.log('Successfully read tasks file');
     res.json(JSON.parse(data));
   } catch (err) {
-    console.error('Error reading tasks:', err);
+    console.error('Error reading tasks file:', err.message);
     res.status(500).json({ error: 'Failed to read tasks' });
   }
 });
@@ -55,19 +54,17 @@ router.post('/', async (req, res) => {
     newTask.id = Date.now();
     newTask.suggestedSlot = suggestTaskSlot(newTask, userCalendar);
 
-    try {
-      await fs.access(TASKS_FILE);
-    } catch {
-      await fs.writeFile(TASKS_FILE, JSON.stringify([]));
-    }
+    console.log('Attempting to access tasks file for write:', TASKS_FILE);
+    await fs.access(TASKS_FILE);
     const data = await fs.readFile(TASKS_FILE, 'utf8');
     const tasks = JSON.parse(data);
     tasks.push(newTask);
 
     await fs.writeFile(TASKS_FILE, JSON.stringify(tasks, null, 2));
+    console.log('Successfully wrote task');
     res.json(newTask);
   } catch (err) {
-    console.error('Error adding task:', err);
+    console.error('Error adding task:', err.message);
     res.status(500).json({ error: 'Failed to add task' });
   }
 });
