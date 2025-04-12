@@ -6,7 +6,7 @@ const usersRouter = require('./routes/users');
 const { router: authRouter, JWT_SECRET } = require('./routes/auth');
 
 const app = express();
-app.use(cors({ origin: 'https://flowbit-app.vercel.app' }));
+app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
 
 const authenticateToken = (req, res, next) => {
