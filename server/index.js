@@ -1,30 +1,29 @@
 const express = require('express');
 const cors = require('cors');
-const taskRoutes = require('./routes/tasks');
-const userRoutes = require('./routes/users');
-require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const tasksRouter = require('./routes/tasks');
+const usersRouter = require('./routes/users');
+const { router: authRouter, JWT_SECRET } = require('./routes/auth');
 
 const app = express();
-
-// Log all incoming requests
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} Headers:`, req.headers);
-  next();
-});
-
-app.use(cors({ origin: process.env.FRONTEND_URL }));
-console.log('CORS origin set to:', process.env.FRONTEND_URL);
+app.use(cors({ origin: 'https://flowbit-app.vercel.app' }));
 app.use(express.json());
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
-app.use('/api/tasks', taskRoutes);
-app.use('/api/users', userRoutes);
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Access denied' });
 
-// Catch-all for unmatched routes
-app.use((req, res) => {
-  console.log(`[${new Date().toISOString()}] 404 Not Found: ${req.method} ${req.url}`);
-  res.status(404).json({ error: 'Not Found' });
-});
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    req.user = user;
+    next();
+  });
+};
+
+app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/tasks', authenticateToken, tasksRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

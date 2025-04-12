@@ -1,4 +1,9 @@
 [
-  { "id": 1, "name": "Alice" },
-  { "id": 2, "name": "Bob" }
+  {
+    "id": 1,
+    "name": "Admin User",
+    "email": "admin@flowbit.com",
+    "username": "admin",
+    "password": "$2b$10$0X9z7q6z0z7X9z7q6z0z7u0X9z7q6z0z7X9z7q6z0z7X9z7q6z0"
+  }
 ]
