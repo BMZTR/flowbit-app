@@ -11,12 +11,15 @@ function MainApp() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('Checking token in MainApp');
     const token = localStorage.getItem('token');
     if (!token) {
+      console.log('No token found, redirecting to /login');
       navigate('/login');
       return;
     }
 
+    console.log('Fetching tasks with token:', token);
     axios.get(`${process.env.REACT_APP_API_URL}/api/tasks`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -28,6 +31,7 @@ function MainApp() {
         console.error('Fetch tasks error:', error.response?.status, error.message);
         setError('Échec du chargement des tâches : ' + (error.message || 'Erreur inconnue'));
         if (error.response?.status === 401 || error.response?.status === 403) {
+          console.log('Unauthorized, clearing token and redirecting to /login');
           localStorage.removeItem('token');
           localStorage.removeItem('username');
           navigate('/login');
@@ -36,6 +40,7 @@ function MainApp() {
   }, [navigate]);
 
   useEffect(() => {
+    console.log('Fetching users');
     axios.get(`${process.env.REACT_APP_API_URL}/api/users`)
       .then(response => {
         console.log('Users fetched:', response.data);
@@ -50,6 +55,10 @@ function MainApp() {
   const handleAddTask = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     try {
       console.log('Adding task:', newTask);
       const response = await axios.post(
@@ -68,6 +77,11 @@ function MainApp() {
     } catch (error) {
       console.error('Add task error:', error.response?.status, error.message);
       setError('Échec de l’ajout de la tâche : ' + (error.message || 'Erreur inconnue'));
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        navigate('/login');
+      }
     }
   };
 
