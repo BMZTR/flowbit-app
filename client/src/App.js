@@ -1,26 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './App.css';
 
-function App() {
+function MainApp() {
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
   const [newTask, setNewTask] = useState({ name: '', duration: '', priority: 'moyenne' });
   const [error, setError] = useState('');
-
-  console.log('API URL:', process.env.REACT_APP_API_URL);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks`)
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    axios.get(`${process.env.REACT_APP_API_URL}/api/tasks`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then(response => {
         console.log('Tasks fetched:', response.data);
         setTasks(response.data || []);
       })
       .catch(error => {
         console.error('Fetch tasks error:', error.response?.status, error.message);
-        setError('Failed to load tasks');
+        setError('Échec du chargement des tâches : ' + (error.message || 'Erreur inconnue'));
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('username');
+          navigate('/login');
+        }
       });
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/api/users`)
@@ -30,26 +43,31 @@ function App() {
       })
       .catch(error => {
         console.error('Fetch users error:', error.response?.status, error.message);
-        setError('Failed to load users');
+        setError('Échec du chargement des utilisateurs : ' + (error.message || 'Erreur inconnue'));
       });
   }, []);
 
   const handleAddTask = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('token');
     try {
       console.log('Adding task:', newTask);
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/tasks`, {
-        name: newTask.name,
-        duration: parseInt(newTask.duration),
-        priority: newTask.priority
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/tasks`,
+        {
+          name: newTask.name,
+          duration: parseInt(newTask.duration),
+          priority: newTask.priority
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       console.log('Task added:', response.data);
       setTasks([...tasks, response.data]);
       setNewTask({ name: '', duration: '', priority: 'moyenne' });
       setError('');
     } catch (error) {
       console.error('Add task error:', error.response?.status, error.message);
-      setError('Failed to add task');
+      setError('Échec de l’ajout de la tâche : ' + (error.message || 'Erreur inconnue'));
     }
   };
 
@@ -58,13 +76,13 @@ function App() {
       <h1>FlowBit</h1>
       {error && <p className="error">{error}</p>}
       <div className="form-container">
-        <h2>Add Task</h2>
+        <h2>Ajouter une tâche</h2>
         <form onSubmit={handleAddTask}>
           <input
             type="text"
             value={newTask.name}
             onChange={e => setNewTask({ ...newTask, name: e.target.value })}
-            placeholder="Task name"
+            placeholder="Nom de la tâche"
             className="form-input"
             required
           />
@@ -72,7 +90,7 @@ function App() {
             type="number"
             value={newTask.duration}
             onChange={e => setNewTask({ ...newTask, duration: e.target.value })}
-            placeholder="Duration (min)"
+            placeholder="Durée (min)"
             className="form-input"
             required
           />
@@ -80,16 +98,17 @@ function App() {
             value={newTask.priority}
             onChange={e => setNewTask({ ...newTask, priority: e.target.value })}
             className="form-select"
+            required
           >
-            <option value="basse">Low</option>
-            <option value="moyenne">Medium</option>
-            <option value="haute">High</option>
+            <option value="basse">Basse</option>
+            <option value="moyenne">Moyenne</option>
+            <option value="haute">Haute</option>
           </select>
-          <button type="submit" className="form-button">Add Task</button>
+          <button type="submit" className="form-button">Ajouter</button>
         </form>
       </div>
       <div>
-        <h2>Users</h2>
+        <h2>Utilisateurs</h2>
         {users.length > 0 ? (
           <ul className="list">
             {users.map(user => (
@@ -97,11 +116,11 @@ function App() {
             ))}
           </ul>
         ) : (
-          <p>No users available</p>
+          <p>Aucun utilisateur disponible</p>
         )}
       </div>
       <div>
-        <h2>Tasks</h2>
+        <h2>Tâches</h2>
         {tasks.length > 0 ? (
           <ul className="list">
             {tasks.map(task => (
@@ -111,11 +130,11 @@ function App() {
             ))}
           </ul>
         ) : (
-          <p>No tasks available</p>
+          <p>Aucune tâche disponible</p>
         )}
       </div>
     </div>
   );
 }
 
-export default App;
+export default MainApp;
