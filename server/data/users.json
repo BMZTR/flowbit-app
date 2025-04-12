@@ -1,9 +1,9 @@
 [
   {
     "id": 1,
-    "name": "Admin User",
-    "email": "admin@flowbit.com",
-    "username": "admin",
-    "password": "$2b$10$0X9z7q6z0z7X9z7q6z0z7u0X9z7q6z0z7X9z7q6z0z7X9z7q6z0"
+    "name": "Test User",
+    "email": "test@flowbit.com",
+    "username": "testuser",
+    "password": "$2b$10$7Q3zK8x9Y2Z5W6V8N4M7P.3X9J2K5L8Q7W4E6R8T9Y2Z5X8V7N4M7"
   }
 ]
