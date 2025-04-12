@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./App.css";
 
 function MainApp() {
   const [tasks, setTasks] = useState([]);
@@ -29,6 +28,7 @@ function MainApp() {
         setError("Échec du chargement des tâches");
         if (error.response?.status === 401 || error.response?.status === 403) {
           localStorage.removeItem("token");
+          localStorage.removeItem("username");
           navigate("/login");
         }
         setIsLoading(false);
@@ -40,9 +40,9 @@ function MainApp() {
   }
 
   return (
-    <div className="App">
+    <div style={{ textAlign: "center" }}>
       <h1>FlowBit</h1>
-      {error && <p className="error">{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <h2>Tâches</h2>
       {tasks.length > 0 ? (
         <ul>
