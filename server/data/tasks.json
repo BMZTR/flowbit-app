@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "name": "Plan call",
+    "duration": 30,
+    "priority": "moyenne",
+    "id": 1744450049698,
+    "suggestedSlot": {
+      "start": "2025-04-12T08:00:00.000Z",
+      "end": "2025-04-12T08:30:00.000Z"
+    }
+  }
+]
