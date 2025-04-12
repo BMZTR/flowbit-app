@@ -1,54 +1,50 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import './Auth.css';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 function Login() {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, credentials);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('username', response.data.username);
-      navigate('/app');
+      const response = await axios.post(
+        "https://flowbit-app.onrender.com/api/auth/login",
+        { email, password }
+      );
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("username", response.data.user.name);
+      navigate("/app");
     } catch (error) {
-      setError(error.response?.data?.error || 'Failed to login');
+      setError("Erreur de connexion : " + (error.response?.data?.message || "Vérifiez vos identifiants"));
     }
   };
 
   return (
-    <div className="auth-container">
-      <h1>FlowBit Login</h1>
+    <div className="login-container">
+      <h2>Connexion à FlowBit</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
         <input
-          type="text"
-          placeholder="Username or Email"
-          value={credentials.username}
-          onChange={e => setCredentials({ ...credentials, username: e.target.value })}
-          className="form-input"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
           required
         />
         <input
           type="password"
-          placeholder="Password"
-          value={credentials.password}
-          onChange={e => setCredentials({ ...credentials, password: e.target.value })}
-          className="form-input"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Mot de passe"
           required
         />
-        <button type="submit" className="form-button">Login</button>
+        <button type="submit">Se connecter</button>
       </form>
-      <p>
-        Forgot password? <a href="/forgot-password">Recover</a>
-      </p>
-      <p>
-        No account? <a href="/register">Register</a>
-      </p>
     </div>
   );
 }
